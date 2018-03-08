@@ -2,6 +2,7 @@ import cheerio from 'cheerio';
 import request from 'request';
 import {promisify} from 'util';
 import zip from 'just-zip-it';
+import get from 'just-safe-get';
 
 class WebsiteFetcher {
   constructor() {
@@ -34,8 +35,9 @@ class CBSBasketballService {
     $('.single-score-card .team .team').map((i,e) => {
       const team = i % 2 === 0 ? home : away;
       team.push({
-        name: e.children[0].data,
-        score: e.parent.parent.children[6].children[0].data,
+        name: get(e, 'children.0.data'),
+        halfTimeScore: get(e, 'parent.parent.children.2.children.0.data'),
+        finalScore: get(e, 'parent.parent.children.6.children.0.data'),
       });
     });
 
@@ -48,7 +50,7 @@ class CBSBasketballService {
 
 async function mainThread() {
   const cbsBasketballService = new CBSBasketballService();
-  const result = await cbsBasketballService.getScores('20180307');
+  const result = await cbsBasketballService.getScores('20180308');
   console.log(result);
 }
 mainThread();
